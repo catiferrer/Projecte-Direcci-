@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projecte Direcció CEIP Serra de Bèrnia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B7355 0%, #D2B48C 50%, #8B9D6F 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            font-style: italic;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 5px solid #8B7355;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            border-left-color: #6B8E5C;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #A0826D 0%, #9B9373 100%);
+            padding: 20px;
+            color: white;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .card-icon {
+            font-size: 2em;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-description {
+            color: #5a5a5a;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .btn-open {
+            display: inline-block;
+            background: linear-gradient(135deg, #8B7355 0%, #A0826D 100%);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .btn-open:hover {
+            background: linear-gradient(135deg, #6B5344 0%, #7A6451 100%);
+            transform: translateX(5px);
+        }
+
+        .btn-open::after {
+            content: ' ↗';
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .decorative-element {
+            display: inline-block;
+            color: #6B8E5C;
+            margin: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: #E8D7C3;
+            color: #5a5a5a;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Projecte Direcció CEIP Serra de Bèrnia</h1>
+            <p><span class="decorative-element">🌿</span>Catalina Ferrer Mestre<span class="decorative-element">🌿</span></p>
+        </div>
+
+        <div class="gallery">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">✓</span>
+                    <span class="card-title">Avaluació Docents</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">Formulari d'avaluació del projecte direcció per al professorat. Recull la teva experiència i suggeriments.</p>
+                    <a href="https://catiferrer.github.io/Projecte-Direcci-/Avaluacio_projecte_direccio_docents.html" class="btn-open" target="_blank">Accedir</a>
+                    <span class="card-tag">Docents</span>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⭐</span>
+                    <span class="card-title">Autoavaluació Alumnat</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">Formulari d'autoavaluació per a l'alumnat sobre el projecte direcció. Valora el teu aprenentatge.</p>
+                    <a href="https://catiferrer.github.io/Projecte-Direcci-/diana_autoavaluacio_alumnat.html" class="btn-open" target="_blank">Accedir</a>
+                    <span class="card-tag">Alumnat</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Projecte Direcció - CEIP Serra de Bèrnia | Desenvolupat amb 🌲 des de Catalonia</p>
+        </div>
+    </div>
+</body>
+</html>
