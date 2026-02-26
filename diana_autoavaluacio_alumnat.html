@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diana d'Autoavaluació</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --beige: #f2ead8;
+    --cream: #faf5ea;
+    --terracotta: #c4714a;
+    --terracotta-light: #d4886a;
+    --wood-light: #c8a97e;
+    --wood-mid: #a07850;
+    --wood-dark: #7a5830;
+    --brown-dark: #4a3020;
+    --moss: #7a8c5a;
+    --burlap: #b8a882;
+    --shadow: rgba(74, 48, 32, 0.35);
+  }
+
+  body {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    font-family: 'Lato', sans-serif;
+    background: #6b4c2a;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* === CLASSROOM BACKGROUND === */
+  .classroom-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(180,130,70,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 30%, rgba(220,180,110,0.3) 0%, transparent 50%),
+      linear-gradient(160deg, #8b6040 0%, #6b4820 40%, #5a3a18 100%);
+    filter: blur(0px);
+  }
+  .classroom-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: 
+      repeating-linear-gradient(90deg, transparent 0, transparent 120px, rgba(0,0,0,0.03) 120px, rgba(0,0,0,0.03) 121px),
+      repeating-linear-gradient(0deg, transparent 0, transparent 80px, rgba(0,0,0,0.03) 80px, rgba(0,0,0,0.03) 81px);
+  }
+  /* fake blurred tables */
+  .table-hint {
+    position: absolute;
+    background: rgba(160,110,60,0.25);
+    border-radius: 6px;
+    filter: blur(8px);
+  }
+
+  /* === SCREEN FRAME === */
+  .screen-frame {
+    position: relative; z-index: 10;
+    width: min(95vw, 960px);
+    height: min(92vh, 680px);
+    background: linear-gradient(145deg, #e8d8b8, #d4c4a0);
+    border-radius: 18px;
+    box-shadow:
+      0 30px 80px rgba(0,0,0,0.7),
+      0 2px 4px rgba(255,255,240,0.3) inset,
+      0 -2px 4px rgba(0,0,0,0.4) inset;
+    border: 3px solid #a07850;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .screen-bezel {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    background: 
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,230,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.1) 0%, transparent 50%);
+    pointer-events: none; z-index: 99;
+  }
+
+  /* === HEADER === */
+  .header {
+    background: linear-gradient(90deg, #7a5830, #9a7040, #7a5830);
+    padding: 12px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    color: #faf0d8;
+    font-size: clamp(16px, 2.5vw, 24px);
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+  }
+  .header-subtitle {
+    font-size: 11px; color: #d4b882; letter-spacing: 2px; text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .wood-grain-h {
+    width: 50px; height: 38px;
+    background: repeating-linear-gradient(92deg, transparent, transparent 3px, rgba(255,255,200,0.07) 3px, rgba(255,255,200,0.07) 4px);
+    border-radius: 4px;
+    opacity: 0.6;
+  }
+
+  /* === MAIN CONTENT === */
+  .main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: 
+      radial-gradient(ellipse at 50% 40%, #faf0d8 0%, #ede0c0 60%, #d8c8a0 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .main-content::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* === CANVAS === */
+  #dianaCanvas {
+    cursor: default;
+    filter: drop-shadow(0 12px 30px rgba(74,48,32,0.4));
+  }
+
+  /* === BOTTOM BAR === */
+  .bottom-bar {
+    background: linear-gradient(90deg, #7a5830, #9a7040, #7a5830);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 -3px 10px rgba(0,0,0,0.2);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .legend {
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: clamp(12px, 1.4vw, 15px); color: #f0d8a8; letter-spacing: 0.5px;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .legend-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+  }
+
+  /* === WOOD BUTTON === */
+  .btn-save {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(13px, 1.6vw, 16px);
+    color: #faf0d8;
+    letter-spacing: 1px;
+    background: linear-gradient(145deg, #a07850, #7a5030, #a07850);
+    border: none;
+    padding: 12px 26px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.5),
+      0 1px 2px rgba(255,240,200,0.3) inset,
+      0 -2px 4px rgba(0,0,0,0.3) inset;
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-save::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(88deg, transparent, transparent 4px, rgba(255,255,200,0.05) 4px, rgba(255,255,200,0.05) 5px);
+  }
+  .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.6), 0 1px 2px rgba(255,240,200,0.3) inset; }
+  .btn-save:active { transform: translateY(1px); box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+
+  .btn-reset {
+    font-family: 'Lato', sans-serif;
+    font-size: clamp(12px, 1.4vw, 14px);
+    color: #c0a070;
+    background: transparent;
+    border: 1px solid #9a7040;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { background: rgba(255,255,200,0.1); color: #e8d0a0; }
+
+  /* === TOAST === */
+  .toast {
+    position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(135deg, #7a5030, #a07050);
+    color: #faf0d8; font-family: 'Playfair Display', serif;
+    padding: 14px 28px; border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    font-size: 15px; letter-spacing: 1px;
+    opacity: 0; transition: all 0.4s;
+    z-index: 1000; pointer-events: none;
+    border: 1px solid rgba(255,220,150,0.3);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="classroom-bg">
+  <div class="table-hint" style="width:200px;height:60px;left:5%;bottom:15%"></div>
+  <div class="table-hint" style="width:180px;height:55px;right:8%;bottom:20%"></div>
+  <div class="table-hint" style="width:160px;height:50px;left:15%;top:20%"></div>
+  <div class="table-hint" style="width:220px;height:65px;right:5%;top:25%"></div>
+</div>
+
+<div class="screen-frame">
+  <div class="screen-bezel"></div>
+
+  <div class="header">
+    <div class="wood-grain-h"></div>
+    <div style="text-align:center">
+      <div class="header h1" style="font-family:'Playfair Display',serif;color:#faf0d8;font-size:clamp(16px,2.5vw,24px);text-shadow:1px 2px 4px rgba(0,0,0,0.5);letter-spacing:1px">Diana d'Autoavaluació</div>
+      <div class="header-subtitle">Reflexiona sobre el teu aprenentatge</div>
+    </div>
+    <div class="wood-grain-h"></div>
+  </div>
+
+  <div class="main-content">
+    <canvas id="dianaCanvas"></canvas>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="legend">
+      <div style="font-family:'Playfair Display',serif;font-size:clamp(11px,1.2vw,13px);color:#d4b070;letter-spacing:1px;margin-right:4px">PEDRES:</div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#6090e8,#3a6fd8)"></div>M'he esforçat</div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#c060e8,#9b3dbf)"></div>He treballat en equip</div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#f0c030,#d4a017)"></div>He aprés els continguts</div>
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#f0f0f0,#b8b8b8);border:1px solid #aaa"></div>Soc ordenat/da</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn-reset" id="btnReset">↺ Reiniciar</button>
+      <button class="btn-save" id="btnSave">🪵 Guardar la Meua Diana</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Diana guardada amb èxit!</div>
+
+<script>
+const canvas = document.getElementById('dianaCanvas');
+const ctx = canvas.getContext('2d');
+
+// Responsive sizing - canvas needs extra space for labels outside the circle
+function getSize() {
+  const container = canvas.parentElement;
+  const w = container.clientWidth - 20;
+  const h = container.clientHeight - 20;
+  const s = Math.min(w, h, 580);
+  return s;
+}
+
+let SIZE = getSize();
+canvas.width = SIZE;
+canvas.height = SIZE;
+const CX = SIZE / 2, CY = SIZE / 2;
+
+// MATH: label_center at R_OUTER + GAP, half-box-width ≈ SIZE*0.09
+// right_edge = SIZE/2 + label_center + half_box < SIZE/2  → must be < SIZE/2
+// So: label_center + half_box < SIZE/2
+// R_OUTER=SIZE*0.28, GAP=SIZE*0.085 → center=SIZE*0.365, half_box≈SIZE*0.09 → edge=SIZE*0.455 ✓
+const R_OUTER = SIZE * 0.28;
+const R_MID   = SIZE * 0.195;
+const R_INNER = SIZE * 0.115;
+const R_EYE   = SIZE * 0.06;
+
+// 4 axes: top, right, bottom, left → angles (radians from right)
+// top = -90°, right = 0°, bottom = 90°, left = 180°
+const AXES = [
+  { label: "M'HE ESFORÇAT",        angle: -Math.PI/2, color: '#8090b0', stoneColor: '#3a6fd8', stoneIndex: 0 },
+  { label: "HE TREBALLAT EN EQUIP", angle: 0,          color: '#c4714a', stoneColor: '#9b3dbf', stoneIndex: 1 },
+  { label: "HE APRÉS ELS CONTINGUTS", angle: Math.PI/2, color: '#7a8c5a', stoneColor: '#d4a017', stoneIndex: 2 },
+  { label: "SOC ORDENAT/DA",        angle: Math.PI,    color: '#c8b888', stoneColor: '#e0e0e0', stoneIndex: 3 },
+];
+
+const RING_LABELS = [
+  { r: R_INNER, text: 'NECESSITE MILLORAR', level: 1 },
+  { r: R_MID,   text: 'VAIG BÉ',            level: 2 },
+  { r: R_OUTER, text: "SOC UN/A EXPERT/A",  level: 3 },
+];
+
+// Stone state: each stone has a position on a ring (0=inner,1=mid,2=outer) and axis
+let stones = [
+  { axisIdx: 0, ring: 1, x: 0, y: 0, dragging: false },
+  { axisIdx: 1, ring: 1, x: 0, y: 0, dragging: false },
+  { axisIdx: 2, ring: 1, x: 0, y: 0, dragging: false },
+  { axisIdx: 3, ring: 1, x: 0, y: 0, dragging: false },
+];
+
+const STONE_R = SIZE * 0.026;
+
+function ringRadius(ring) {
+  // ring: 0=inner zone, 1=mid zone, 2=outer zone
+  const mid0 = R_EYE + (R_INNER - R_EYE) * 0.6;
+  const mid1 = R_INNER + (R_MID - R_INNER) * 0.55;
+  const mid2 = R_MID + (R_OUTER - R_MID) * 0.58;
+  return [mid0, mid1, mid2][ring];
+}
+
+function stonePos(stone) {
+  const axis = AXES[stone.axisIdx];
+  const r = ringRadius(stone.ring);
+  return {
+    x: CX + r * Math.cos(axis.angle),
+    y: CY + r * Math.sin(axis.angle)
+  };
+}
+
+function updateStonePositions() {
+  stones.forEach(s => {
+    if (!s.dragging) {
+      const p = stonePos(s);
+      s.x = p.x; s.y = p.y;
+    }
+  });
+}
+updateStonePositions();
+
+// ===== DRAW =====
+
+function woodGradient(x, y, r, col1, col2) {
+  const g = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.1, x, y, r);
+  g.addColorStop(0, col1);
+  g.addColorStop(0.6, col2);
+  g.addColorStop(1, col1);
+  return g;
+}
+
+function drawCircleWithTexture(cx, cy, r, fillStyle, strokeStyle, strokeW) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = strokeW || 2;
+    ctx.stroke();
+  }
+}
+
+function drawPaperRings() {
+  // OUTER ring — GREEN (expert/best) with organic warm-green earthy tone
+  const g3 = ctx.createRadialGradient(CX - R_OUTER*0.2, CY - R_OUTER*0.2, R_MID * 0.5, CX, CY, R_OUTER);
+  g3.addColorStop(0,   '#7aad6a');
+  g3.addColorStop(0.4, '#5e9c50');
+  g3.addColorStop(0.75,'#4a8840');
+  g3.addColorStop(1,   '#3a7230');
+  drawCircleWithTexture(CX, CY, R_OUTER, g3, '#2e5e22', 3);
+  // subtle paper grain on green
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX, CY, R_OUTER, 0, Math.PI*2); ctx.clip();
+  ctx.strokeStyle = 'rgba(255,255,200,0.06)';
+  ctx.lineWidth = 1;
+  for (let i = -R_OUTER*2; i < R_OUTER*2; i += 6) {
+    ctx.beginPath(); ctx.moveTo(CX + i, CY - R_OUTER); ctx.lineTo(CX + i, CY + R_OUTER); ctx.stroke();
+  }
+  ctx.restore();
+
+  // MID ring — ORANGE (going well) with warm amber-terracotta
+  const g2 = ctx.createRadialGradient(CX - R_MID*0.2, CY - R_MID*0.2, R_INNER * 0.5, CX, CY, R_MID);
+  g2.addColorStop(0,   '#e89040');
+  g2.addColorStop(0.4, '#d47828');
+  g2.addColorStop(0.75,'#c06818');
+  g2.addColorStop(1,   '#a85610');
+  drawCircleWithTexture(CX, CY, R_MID, g2, '#8a4408', 3);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX, CY, R_MID, 0, Math.PI*2); ctx.clip();
+  ctx.strokeStyle = 'rgba(255,240,180,0.07)';
+  ctx.lineWidth = 1;
+  for (let i = -R_MID*2; i < R_MID*2; i += 6) {
+    ctx.beginPath(); ctx.moveTo(CX + i, CY - R_MID); ctx.lineTo(CX + i, CY + R_MID); ctx.stroke();
+  }
+  ctx.restore();
+
+  // INNER ring — RED (needs improvement) with warm brick-red earthy tone
+  const g1 = ctx.createRadialGradient(CX - R_INNER*0.2, CY - R_INNER*0.2, R_EYE * 0.5, CX, CY, R_INNER);
+  g1.addColorStop(0,   '#d45050');
+  g1.addColorStop(0.4, '#c03838');
+  g1.addColorStop(0.75,'#a82828');
+  g1.addColorStop(1,   '#8c1818');
+  drawCircleWithTexture(CX, CY, R_INNER, g1, '#701010', 3);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX, CY, R_INNER, 0, Math.PI*2); ctx.clip();
+  ctx.strokeStyle = 'rgba(255,200,180,0.08)';
+  ctx.lineWidth = 1;
+  for (let i = -R_INNER*2; i < R_INNER*2; i += 6) {
+    ctx.beginPath(); ctx.moveTo(CX + i, CY - R_INNER); ctx.lineTo(CX + i, CY + R_INNER); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawDividers() {
+  // 4 wooden wedge dividers
+  ctx.save();
+  AXES.forEach((ax) => {
+    const perpAngle = ax.angle + Math.PI/2;
+    const hw = SIZE * 0.009; // half-width
+    ctx.save();
+    ctx.translate(CX, CY);
+    ctx.rotate(ax.angle);
+    const grad = ctx.createLinearGradient(0, -hw, 0, hw);
+    grad.addColorStop(0, '#a07850');
+    grad.addColorStop(0.4, '#c89a60');
+    grad.addColorStop(0.6, '#b08848');
+    grad.addColorStop(1, '#8a6030');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 2;
+    ctx.beginPath();
+    ctx.moveTo(R_EYE, -hw);
+    ctx.lineTo(R_OUTER + 5, -hw * 0.5);
+    ctx.lineTo(R_OUTER + 5, hw * 0.5);
+    ctx.lineTo(R_EYE, hw);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function drawBullseye() {
+  // Glowing center
+  const glow = ctx.createRadialGradient(CX, CY, 0, CX, CY, R_EYE);
+  glow.addColorStop(0, '#ffe8c0');
+  glow.addColorStop(0.4, '#f0d090');
+  glow.addColorStop(0.8, '#d4a860');
+  glow.addColorStop(1, '#b88840');
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(255, 200, 80, 0.6)';
+  ctx.shadowBlur = 20;
+  drawCircleWithTexture(CX, CY, R_EYE, glow, '#c8983a', 3);
+  ctx.restore();
+
+  // "COM HO HE FET?" text
+  ctx.save();
+  ctx.font = `bold ${SIZE * 0.028}px 'Playfair Display', serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#5a3010';
+  ctx.shadowColor = 'rgba(255,220,130,0.8)';
+  ctx.shadowBlur = 6;
+  
+  const line1 = 'COM HO';
+  const line2 = 'HE FET?';
+  const lh = SIZE * 0.033;
+  ctx.fillText(line1, CX, CY - lh * 0.6);
+  ctx.fillText(line2, CX, CY + lh * 0.6);
+  ctx.restore();
+}
+
+function drawAxisLabels() {
+  AXES.forEach((ax) => {
+    // Label center just after wooden frame (frame edge = R_OUTER + SIZE*0.06)
+    // center = SIZE*0.375, half_box ≈ SIZE*0.085 → edge = SIZE*0.46 < SIZE*0.50 ✓
+    const labelR = R_OUTER + SIZE * 0.06 + SIZE * 0.038;
+    const lx = CX + labelR * Math.cos(ax.angle);
+    const ly = CY + labelR * Math.sin(ax.angle);
+
+    ctx.save();
+    ctx.translate(lx, ly);
+
+    const fontSize = SIZE * 0.024;
+    ctx.font = `bold ${fontSize}px 'Playfair Display', serif`;
+
+    // Wrap text — limit line width to SIZE*0.14 so half_box stays small
+    const words = ax.label.split(' ');
+    const lineH = fontSize * 1.45;
+    let lines = [];
+    let cur = '';
+    words.forEach(w => {
+      const test = cur ? cur + ' ' + w : w;
+      if (ctx.measureText(test).width > SIZE * 0.14 && cur) {
+        lines.push(cur); cur = w;
+      } else { cur = test; }
+    });
+    lines.push(cur);
+
+    const tw = lines.reduce((mx, l) => Math.max(mx, ctx.measureText(l).width), 0);
+    const th = lines.length * lineH;
+    const pad = SIZE * 0.016;
+
+    const bx = -tw/2 - pad, by = -th/2 - pad;
+    const bw = tw + pad*2, bh = th + pad*2;
+    const radius = 8;
+
+    // Wooden label background
+    ctx.save();
+    const woodG = ctx.createLinearGradient(bx, by, bx, by + bh);
+    woodG.addColorStop(0, '#d4a868');
+    woodG.addColorStop(0.4, '#b08840');
+    woodG.addColorStop(0.7, '#966830');
+    woodG.addColorStop(1, '#7a5020');
+    ctx.shadowColor = 'rgba(0,0,0,0.55)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, radius);
+    ctx.fillStyle = woodG;
+    ctx.fill();
+    // Grain lines
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(255,230,150,0.12)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < bh; i += 5) {
+      ctx.beginPath(); ctx.moveTo(bx, by + i); ctx.lineTo(bx + bw, by + i); ctx.stroke();
+    }
+    ctx.restore();
+    // Border
+    ctx.strokeStyle = '#6a4010';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, radius);
+    ctx.stroke();
+    // Inner highlight edge
+    ctx.strokeStyle = 'rgba(255,230,160,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(bx + 1.5, by + 1.5, bw - 3, bh - 3, radius - 1);
+    ctx.stroke();
+    ctx.restore();
+
+    // Text
+    ctx.font = `bold ${fontSize}px 'Playfair Display', serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff8e8';
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowBlur = 4;
+    lines.forEach((line, i) => {
+      const ty = -th/2 + lineH * 0.5 + i * lineH;
+      ctx.fillText(line, 0, ty);
+    });
+
+    ctx.restore();
+  });
+}
+
+function drawRingLabels() {
+  // Each ring gets a label badge with matching color tone
+  const ringInfo = [
+    { r: R_INNER, prev: R_EYE,   text: 'NECESSITE MILLORAR', bg: 'rgba(140,20,20,0.82)',  border: '#ff8888', fg: '#ffe0e0' },
+    { r: R_MID,   prev: R_INNER, text: 'VAIG BÉ',            bg: 'rgba(140,80,8,0.82)',   border: '#ffcc66', fg: '#fff0c0' },
+    { r: R_OUTER, prev: R_MID,   text: "SOC UN/A EXPERT/A",  bg: 'rgba(30,80,20,0.82)',   border: '#aae088', fg: '#d8ffcc' },
+  ];
+
+  ringInfo.forEach(rl => {
+    // Place badge between the two ring edges, on the top-right diagonal
+    const midR = rl.prev + (rl.r - rl.prev) * 0.5;
+    const angle = -Math.PI / 4;
+    const lx = CX + midR * Math.cos(angle);
+    const ly = CY + midR * Math.sin(angle);
+
+    ctx.save();
+    ctx.translate(lx, ly);
+
+    ctx.font = `bold ${SIZE * 0.017}px 'Lato', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const tw = ctx.measureText(rl.text).width;
+    const pad = SIZE * 0.012;
+    const bw = tw + pad*2, bh = SIZE * 0.030;
+
+    // Pill background
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = rl.bg;
+    ctx.beginPath();
+    ctx.roundRect(-bw/2, -bh/2, bw, bh, bh/2);
+    ctx.fill();
+    ctx.strokeStyle = rl.border;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = rl.fg;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(rl.text, 0, 0);
+    ctx.restore();
+  });
+}
+
+function drawStone(stone) {
+  const ax = AXES[stone.axisIdx];
+  const sr = STONE_R;
+  const x = stone.x, y = stone.y;
+
+  ctx.save();
+
+  // Shadow
+  ctx.shadowColor = 'rgba(60,30,10,0.5)';
+  ctx.shadowBlur = stone.dragging ? 20 : 10;
+  ctx.shadowOffsetX = stone.dragging ? 4 : 2;
+  ctx.shadowOffsetY = stone.dragging ? 8 : 4;
+
+  // Stone base gradient
+  const stoneG = ctx.createRadialGradient(x - sr*0.3, y - sr*0.35, sr*0.05, x, y, sr);
+  const c = ax.stoneColor;
+  stoneG.addColorStop(0, lighten(c, 40));
+  stoneG.addColorStop(0.4, c);
+  stoneG.addColorStop(1, darken(c, 30));
+
+  ctx.beginPath();
+  ctx.ellipse(x, y, sr, sr * 0.88, -0.3, 0, Math.PI * 2);
+  ctx.fillStyle = stoneG;
+  ctx.fill();
+
+  // Highlight
+  const hlG = ctx.createRadialGradient(x - sr*0.3, y - sr*0.35, 0, x - sr*0.2, y - sr*0.2, sr * 0.6);
+  hlG.addColorStop(0, 'rgba(255,255,255,0.45)');
+  hlG.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.beginPath();
+  ctx.ellipse(x, y, sr, sr * 0.88, -0.3, 0, Math.PI * 2);
+  ctx.fillStyle = hlG;
+  ctx.fill();
+
+  // Number label on stone
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.font = `bold ${sr * 0.9}px 'Lato', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillText(stone.axisIdx + 1, x, y + 1);
+
+  ctx.restore();
+}
+
+function lighten(hex, pct) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,r+pct)},${Math.min(255,g+pct)},${Math.min(255,b+pct)})`;
+}
+function darken(hex, pct) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.max(0,r-pct)},${Math.max(0,g-pct)},${Math.max(0,b-pct)})`;
+}
+
+function drawBackground() {
+  // Subtle paper texture behind whole canvas
+  const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, R_OUTER * 1.4);
+  bg.addColorStop(0, '#f8ecd8');
+  bg.addColorStop(0.7, '#eddcb8');
+  bg.addColorStop(1, '#d8c8a0');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, SIZE, SIZE);
+}
+
+function drawOuter() {
+  // Wooden frame ring
+  const fw = SIZE * 0.06;
+  const outerR = R_OUTER + fw;
+  const woodRG = ctx.createRadialGradient(CX, CY, R_OUTER, CX, CY, outerR);
+  woodRG.addColorStop(0, '#9a7848');
+  woodRG.addColorStop(0.4, '#c09858');
+  woodRG.addColorStop(0.7, '#a87840');
+  woodRG.addColorStop(1, '#7a5828');
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX, CY, outerR, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2, true);
+  ctx.fillStyle = woodRG;
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowBlur = 15;
+  ctx.shadowOffsetY = 5;
+  ctx.fill();
+
+  // Grain lines on wooden frame
+  ctx.clip(); // reuse path
+  ctx.strokeStyle = 'rgba(255,220,120,0.12)';
+  ctx.lineWidth = 1;
+  for (let a = 0; a < Math.PI * 2; a += 0.05) {
+    ctx.beginPath();
+    ctx.arc(CX, CY, R_OUTER + fw * 0.5 + Math.sin(a*7)*2, a, a + 0.04);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Outer border
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX, CY, outerR, 0, Math.PI * 2);
+  ctx.strokeStyle = '#6a4820';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, SIZE, SIZE);
+  drawBackground();
+  drawOuter();
+  drawPaperRings();
+  drawDividers();
+  drawRingLabels();
+  drawAxisLabels();
+  drawBullseye();
+
+  // Draw non-dragging stones first
+  stones.forEach(s => { if (!s.dragging) drawStone(s); });
+  // Dragging stone on top
+  stones.forEach(s => { if (s.dragging) drawStone(s); });
+}
+
+// ===== INTERACTION =====
+
+let dragStone = null;
+let dragOffX = 0, dragOffY = 0;
+
+function getEventPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = SIZE / rect.width;
+  const scaleY = SIZE / rect.height;
+  if (e.touches) {
+    return {
+      x: (e.touches[0].clientX - rect.left) * scaleX,
+      y: (e.touches[0].clientY - rect.top) * scaleY
+    };
+  }
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
+
+function hitStone(pos) {
+  for (let i = stones.length - 1; i >= 0; i--) {
+    const s = stones[i];
+    const dx = pos.x - s.x, dy = pos.y - s.y;
+    if (Math.sqrt(dx*dx + dy*dy) < STONE_R * 1.5) return s;
+  }
+  return null;
+}
+
+function snapStone(stone, x, y) {
+  // Determine axis (closest)
+  const dx = x - CX, dy = y - CY;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  let angle = Math.atan2(dy, dx);
+
+  // Find closest axis
+  let minDiff = Infinity, bestAxis = 0;
+  AXES.forEach((ax, i) => {
+    let diff = Math.abs(normalizeAngle(angle - ax.angle));
+    if (diff < minDiff) { minDiff = diff; bestAxis = i; }
+  });
+
+  // Find closest ring
+  let bestRing = 0, minRDiff = Infinity;
+  [R_EYE + (R_INNER-R_EYE)*0.6, R_INNER+(R_MID-R_INNER)*0.55, R_MID+(R_OUTER-R_MID)*0.58].forEach((r, i) => {
+    const d = Math.abs(dist - r);
+    if (d < minRDiff) { minRDiff = d; bestRing = i; }
+  });
+
+  // Snap only if close enough to target area
+  stone.axisIdx = bestAxis;
+  stone.ring = bestRing;
+  stone.dragging = false;
+  const p = stonePos(stone);
+  stone.x = p.x; stone.y = p.y;
+
+  playWoodSound();
+}
+
+function normalizeAngle(a) {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+}
+
+function playWoodSound() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = ac.createBuffer(1, ac.sampleRate * 0.08, ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ac.sampleRate * 0.015));
+    }
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const filter = ac.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 800;
+    filter.Q.value = 2;
+    src.connect(filter);
+    filter.connect(ac.destination);
+    src.start();
+    setTimeout(() => ac.close(), 200);
+  } catch(e) {}
+}
+
+canvas.addEventListener('mousedown', e => {
+  const pos = getEventPos(e);
+  dragStone = hitStone(pos);
+  if (dragStone) {
+    dragStone.dragging = true;
+    dragOffX = pos.x - dragStone.x;
+    dragOffY = pos.y - dragStone.y;
+    canvas.style.cursor = 'grabbing';
+    draw();
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!dragStone) {
+    const pos = getEventPos(e);
+    canvas.style.cursor = hitStone(pos) ? 'grab' : 'default';
+    return;
+  }
+  const pos = getEventPos(e);
+  dragStone.x = pos.x - dragOffX;
+  dragStone.y = pos.y - dragOffY;
+  draw();
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (dragStone) {
+    const pos = getEventPos(e);
+    snapStone(dragStone, dragStone.x, dragStone.y);
+    dragStone = null;
+    canvas.style.cursor = 'default';
+    draw();
+  }
+});
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const pos = getEventPos(e);
+  dragStone = hitStone(pos);
+  if (dragStone) {
+    dragStone.dragging = true;
+    dragOffX = pos.x - dragStone.x;
+    dragOffY = pos.y - dragStone.y;
+    draw();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (dragStone) {
+    const pos = getEventPos(e);
+    dragStone.x = pos.x - dragOffX;
+    dragStone.y = pos.y - dragOffY;
+    draw();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (dragStone) {
+    snapStone(dragStone, dragStone.x, dragStone.y);
+    dragStone = null;
+    draw();
+  }
+});
+
+// Resize
+window.addEventListener('resize', () => {
+  const newSize = getSize();
+  if (Math.abs(newSize - SIZE) > 10) {
+    SIZE = newSize;
+    canvas.width = SIZE; canvas.height = SIZE;
+    updateStonePositions();
+    draw();
+  }
+});
+
+// ===== FEEDBACK MODAL =====
+const modalHTML = `
+<div id="feedbackModal" style="
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(60,35,10,0.72); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+">
+  <div id="feedbackBox" style="
+    background:linear-gradient(145deg,#faf4e0,#f0e4c4,#e8d8a8);
+    border-radius:20px; padding:36px 40px; max-width:560px; width:90%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 2px 4px rgba(255,240,180,0.4) inset;
+    border:2px solid #b08840;
+    position:relative; overflow:hidden;
+  ">
+    <!-- paper texture overlay -->
+    <div style="position:absolute;inset:0;border-radius:20px;background:repeating-linear-gradient(92deg,transparent,transparent 3px,rgba(160,120,60,0.04) 3px,rgba(160,120,60,0.04) 4px);pointer-events:none"></div>
+
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:36px;margin-bottom:8px" id="feedbackEmoji">⭐</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;color:#7a4820;font-weight:700;text-shadow:0 1px 3px rgba(255,220,120,0.5);letter-spacing:1px">Molt bé!</div>
+      <div style="width:60px;height:3px;background:linear-gradient(90deg,transparent,#c08840,transparent);margin:10px auto 0"></div>
+    </div>
+
+    <div id="feedbackText" style="
+      font-family:'Lato',sans-serif; font-size:16px; line-height:1.75;
+      color:#5a3010; text-align:center; min-height:80px;
+      position:relative;z-index:1;
+    ">
+      <div id="feedbackLoading" style="display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.7;padding:20px 0">
+        <span style="animation:dotPulse 1.2s infinite">●</span>
+        <span style="animation:dotPulse 1.2s 0.4s infinite">●</span>
+        <span style="animation:dotPulse 1.2s 0.8s infinite">●</span>
+      </div>
+      <div id="feedbackMsg" style="display:none"></div>
+    </div>
+
+    <!-- Score row -->
+    <div id="scoreRow" style="display:none;justify-content:center;gap:18px;margin:18px 0 0;flex-wrap:wrap"></div>
+
+    <div style="text-align:center;margin-top:22px">
+      <button id="btnCloseFeedback" style="
+        font-family:'Playfair Display',serif; font-size:14px; letter-spacing:1px;
+        color:#faf0d8; background:linear-gradient(145deg,#a07850,#7a5030,#a07850);
+        border:none; padding:12px 32px; border-radius:10px; cursor:pointer;
+        box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 1px 2px rgba(255,240,180,0.3) inset;
+        text-transform:uppercase; transition:transform 0.15s;
+        position:relative;z-index:1;
+      ">Continuar →</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes dotPulse {
+  0%,80%,100%{opacity:0.2;transform:scale(0.8)}
+  40%{opacity:1;transform:scale(1.2)}
+}
+</style>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+document.getElementById('btnCloseFeedback').addEventListener('click', () => {
+  document.getElementById('feedbackModal').style.display = 'none';
+});
+
+const AXIS_NAMES = [
+  "L'ESFORÇ",
+  "EL TREBALL EN EQUIP",
+  "ELS CONTINGUTS APRESOS",
+  "L'ORDRE I LA PRESENTACIÓ"
+];
+const RING_NAMES = ['NECESSITE MILLORAR', 'VAIG BÉ', "SOC UN/A EXPERT/A"];
+const RING_EMOJIS = ['🌱', '⭐', '🏆'];
+const STONE_COLORS_HEX = ['#3a6fd8','#9b3dbf','#d4a017','#e0e0e0'];
+
+async function getFeedback(stoneData) {
+  const desc = stoneData.map(s =>
+    `- ${AXIS_NAMES[s.axisIdx]}: ${RING_NAMES[s.ring]}`
+  ).join('\n');
+
+  const prompt = `Ets un mestre/a de primària molt positiu/iva i animós/a. Un alumne ha fet la seua autoavaluació amb una diana interactiva i ha col·locat les pedres en:
+
+${desc}
+
+Escriu un missatge de FEEDBACK PERSONALITZAT en VALENCIÀ per a l'alumne. Ha de ser:
+- Totalment en positiu, càlid i motivador
+- Curt (3-4 frases màxim)
+- Felicitar per el que ha fet bé, i animar (no criticar) en el que ha marcat "NECESSITE MILLORAR"
+- Usa un to proper, com si li parlares directament ("Has fet...", "Estàs fent...", "Segueix...")
+- Acaba amb una frase motivadora per al pròxim dia
+- NO uses asteriscs ni format markdown, només text pla amb frases naturals`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await response.json();
+  return data.content?.[0]?.text || "Molt bé! Segueix esforçant-te cada dia! 🌟";
+}
+
+// Buttons
+document.getElementById('btnSave').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSave');
+  btn.style.transform = 'scale(0.96) translateY(1px)';
+  setTimeout(() => btn.style.transform = '', 200);
+
+  // Show modal
+  const modal = document.getElementById('feedbackModal');
+  modal.style.display = 'flex';
+  document.getElementById('feedbackLoading').style.display = 'flex';
+  document.getElementById('feedbackMsg').style.display = 'none';
+  document.getElementById('scoreRow').style.display = 'none';
+
+  // Pick best emoji based on average ring level
+  const avg = stones.reduce((s,st) => s + st.ring, 0) / stones.length;
+  const emojiEl = document.getElementById('feedbackEmoji');
+  emojiEl.textContent = avg < 0.7 ? '🌱' : avg < 1.5 ? '⭐' : avg < 2.2 ? '🏆' : '🌟';
+
+  // Score chips
+  const scoreRow = document.getElementById('scoreRow');
+  scoreRow.innerHTML = stones.map(s => `
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(120,80,30,0.12);border-radius:20px;padding:4px 12px;border:1px solid rgba(120,80,30,0.2)">
+      <div style="width:10px;height:10px;border-radius:50%;background:${STONE_COLORS_HEX[s.axisIdx]};box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
+      <span style="font-size:12px;color:#7a4820;font-family:'Lato',sans-serif">${RING_EMOJIS[s.ring]} ${RING_NAMES[s.ring]}</span>
+    </div>
+  `).join('');
+  scoreRow.style.display = 'flex';
+
+  // Get AI feedback
+  try {
+    const msg = await getFeedback(stones);
+    document.getElementById('feedbackLoading').style.display = 'none';
+    const msgEl = document.getElementById('feedbackMsg');
+    msgEl.style.display = 'block';
+    // Typewriter effect
+    msgEl.textContent = '';
+    let i = 0;
+    const interval = setInterval(() => {
+      msgEl.textContent += msg[i];
+      i++;
+      if (i >= msg.length) clearInterval(interval);
+    }, 18);
+  } catch(e) {
+    document.getElementById('feedbackLoading').style.display = 'none';
+    document.getElementById('feedbackMsg').style.display = 'block';
+    document.getElementById('feedbackMsg').textContent = "Has fet una reflexió molt valuosa! Continua treballant amb ganes i seguiràs creixent! 🌟";
+  }
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  stones = [
+    { axisIdx: 0, ring: 1, x: 0, y: 0, dragging: false },
+    { axisIdx: 1, ring: 1, x: 0, y: 0, dragging: false },
+    { axisIdx: 2, ring: 1, x: 0, y: 0, dragging: false },
+    { axisIdx: 3, ring: 1, x: 0, y: 0, dragging: false },
+  ];
+  updateStonePositions();
+  draw();
+});
+
+// Initial draw
+draw();
+</script>
+</body>
+</html>
