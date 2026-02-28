@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anàlisi Consulta Consell Escolar - CEIP Serra de Bèrnia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #6B4423;
+            --color-secondary: #8B5A3C;
+            --color-accent: #6B8E23;
+            --color-positive: #7D9B4F;
+            --color-negative: #A0522D;
+            --color-bg: #F5E6D3;
+            --color-card: #FEFBF6;
+            --color-text: #3E2723;
+            --color-text-light: #6D4C41;
+            --color-border: #D4C4B0;
+            --color-vine: #556B2F;
+            --shadow: 0 8px 30px rgba(107, 68, 35, 0.15);
+            --shadow-hover: 0 12px 40px rgba(107, 68, 35, 0.25);
+            --glow: 0 0 20px rgba(107, 142, 35, 0.3);
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #F5E6D3 0%, #EAD8C0 50%, #F5E6D3 100%);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 90, 60, 0.03) 2px, rgba(139, 90, 60, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139, 90, 60, 0.03) 2px, rgba(139, 90, 60, 0.03) 4px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(212, 196, 176, 0.4) 0%, rgba(234, 216, 192, 0.3) 100%);
+            border-radius: 24px;
+            color: var(--color-text);
+            box-shadow: var(--shadow);
+            border: 2px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                var(--color-primary) 0%, 
+                var(--color-secondary) 25%,
+                var(--color-accent) 50%,
+                var(--color-secondary) 75%,
+                var(--color-primary) 100%
+            );
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                var(--color-primary) 0%, 
+                var(--color-secondary) 25%,
+                var(--color-accent) 50%,
+                var(--color-secondary) 75%,
+                var(--color-primary) 100%
+            );
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+            text-shadow: 2px 2px 4px rgba(62, 39, 35, 0.2);
+            color: var(--color-primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+            color: var(--color-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--color-card);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--color-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            opacity: 0.8;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover), var(--glow);
+            border-color: var(--color-accent);
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--color-text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: var(--color-card);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--color-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                var(--color-primary) 0%, 
+                var(--color-accent) 50%,
+                var(--color-primary) 100%
+            );
+            background-size: 200% 100%;
+            animation: gradient 4s ease infinite;
+        }
+
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .chart-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: var(--shadow-hover), var(--glow);
+            border-color: var(--color-accent);
+        }
+
+        .chart-header {
+            margin-bottom: 1rem;
+        }
+
+        .chart-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--color-accent);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .chart-question {
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+            font-style: italic;
+            line-height: 1.5;
+            padding: 1rem;
+            background: rgba(212, 196, 176, 0.2);
+            border-left: 3px solid var(--color-accent);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .full-width .chart-container {
+            height: 450px;
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, rgba(245, 222, 179, 0.3) 0%, rgba(222, 184, 135, 0.2) 100%);
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            border-left: 5px solid #B8860B;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-top: 3rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-box::before {
+            content: '💡';
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.08;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .insight-box h4 {
+            color: #8B6914;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0 2px 4px rgba(139, 105, 20, 0.1);
+        }
+
+        .insight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insight-box li {
+            color: var(--color-text);
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .insight-box li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .insight-box strong {
+            color: #8B6914;
+            font-weight: 700;
+        }
+
+        .quotes-section {
+            margin-top: 4rem;
+            padding: 3rem;
+            background: var(--color-card);
+            border-radius: 24px;
+            border: 2px solid var(--color-border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .quotes-section h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--color-primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(107, 68, 35, 0.1);
+        }
+
+        .quote-card {
+            background: rgba(234, 216, 192, 0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 16px;
+            border-left: 5px solid var(--color-primary);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .quote-card:hover {
+            transform: translateX(10px);
+            border-left-color: var(--color-accent);
+            background: rgba(234, 216, 192, 0.5);
+        }
+
+        .quote-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 80px;
+            color: var(--color-primary);
+            opacity: 0.15;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .quote-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--color-accent);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .quote-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--color-text);
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <!-- Decoración de viña SVG -->
+            <svg style="position: absolute; top: 20px; left: 20px; width: 100px; height: 100px; opacity: 0.15;" viewBox="0 0 100 100">
+                <path d="M10,80 Q30,60 50,50" stroke="#6B4423" stroke-width="3" fill="none"/>
+                <path d="M50,50 Q70,40 90,30" stroke="#6B4423" stroke-width="2.5" fill="none"/>
+                <path d="M25,65 Q30,60 35,65 Q30,70 25,65" fill="#6B8E23" opacity="0.8"/>
+                <path d="M40,55 Q45,50 50,55 Q45,60 40,55" fill="#7D9B4F" opacity="0.8"/>
+                <path d="M65,45 Q70,40 75,45 Q70,50 65,45" fill="#556B2F" opacity="0.8"/>
+            </svg>
+            
+            <svg style="position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; opacity: 0.15; transform: scaleX(-1);" viewBox="0 0 100 100">
+                <path d="M10,80 Q30,60 50,50" stroke="#6B4423" stroke-width="3" fill="none"/>
+                <path d="M50,50 Q70,40 90,30" stroke="#6B4423" stroke-width="2.5" fill="none"/>
+                <path d="M25,65 Q30,60 35,65 Q30,70 25,65" fill="#6B8E23" opacity="0.8"/>
+                <path d="M40,55 Q45,50 50,55 Q45,60 40,55" fill="#7D9B4F" opacity="0.8"/>
+                <path d="M65,45 Q70,40 75,45 Q70,50 65,45" fill="#556B2F" opacity="0.8"/>
+            </svg>
+            
+            <h1>Anàlisi de la Consulta al Consell Escolar</h1>
+            <p class="subtitle">CEIP Serra de Bèrnia - Projecte de Direcció</p>
+            <p class="subtitle" style="margin-top: 0.5rem; font-size: 1rem; opacity: 0.85;">Catalina Ferrer Mestre</p>
+            
+            <!-- Viña decorativa central -->
+            <svg style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); width: 200px; height: 60px; opacity: 0.2;" viewBox="0 0 200 60">
+                <path d="M20,50 Q60,30 100,40 Q140,30 180,50" stroke="#6B4423" stroke-width="4" fill="none"/>
+                <path d="M40,45 Q45,40 50,45 Q45,50 40,45" fill="#6B8E23"/>
+                <path d="M70,35 Q75,30 80,35 Q75,40 70,35" fill="#7D9B4F"/>
+                <path d="M100,40 Q105,35 110,40 Q105,45 100,40" fill="#556B2F"/>
+                <path d="M130,35 Q135,30 140,35 Q135,40 130,35" fill="#6B8E23"/>
+                <path d="M160,45 Q165,40 170,45 Q165,50 160,45" fill="#7D9B4F"/>
+            </svg>
+        </header>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number">7/12</div>
+                <div class="stat-label">Respostes obtingudes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">58.3%</div>
+                <div class="stat-label">Taxa de participació</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Àrees avaluades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">47.6%</div>
+                <div class="stat-label">Satisfacció mitjana</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <div class="chart-category">VISIÓ GENERAL</div>
+                    <h3>Panorama complet de totes les àrees avaluades</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="overviewChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-category">1. COMUNICACIÓ</div>
+                    <h3>Comunicació escola-famílies</h3>
+                    <div class="chart-question">
+                        "Creus que la comunicació de l'escola amb les famílies és adequada i efectiva?"
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comunicacioChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-category">2. PARTICIPACIÓ</div>
+                    <h3>Participació de les famílies</h3>
+                    <div class="chart-question">
+                        "Et sembla que les famílies participeu el suficient a l'escola?"
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="participacioChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-category">3. RESULTATS ACADÈMICS</div>
+                    <h3>Resultats acadèmics de l'alumnat</h3>
+                    <div class="chart-question">
+                        "Creus que els resultats acadèmics de l'alumnat del centre són satisfactoris?"
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="resultatsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <div class="chart-category">ANÀLISI COMPARATIVA</div>
+                    <h3>Comparativa de satisfacció entre àrees</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box">
+            <h4>💡 Principals conclusions</h4>
+            <ul>
+                <li><strong>Participació:</strong> 7 de 12 membres del Consell Escolar han participat (58.3% de resposta)</li>
+                <li><strong>Àrea més positiva:</strong> Els resultats acadèmics són valorats positivament (57.1% aprova)</li>
+                <li><strong>Àrees de millora:</strong> Comunicació i participació familiar necessiten atenció (només 42.9% satisfacció)</li>
+                <li><strong>Preocupació destacada:</strong> Necessitat de reforçar la transparència en la gestió i millorar els canals de comunicació</li>
+            </ul>
+        </div>
+
+        <div class="quotes-section">
+            <h3>💬 Idees principals del Consell Escolar</h3>
+            
+            <div class="quote-card">
+                <div class="quote-category">COMUNICACIÓ</div>
+                <div class="quote-text">
+                    Cal reforçar la claredat i transparència en la presentació de comptes i informació sobre gestió i projecte educatiu. Considerar canals alternatius com WhatsApp per millorar l'efectivitat de la comunicació.
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <div class="quote-category">PARTICIPACIÓ FAMILIAR</div>
+                <div class="quote-text">
+                    Els horaris de reunions poden dificultar l'assistència. Cal analitzar si aquesta és la causa de la baixa participació i impulsar noves estratègies. Les famílies reconeixen que la implicació actual és puntual i limitada pel dia a dia.
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <div class="quote-category">COORDINACIÓ AMB DIRECTIVA</div>
+                <div class="quote-text">
+                    Es necessita una comunicació més propera i fluida amb l'equip directiu per abordar necessitats i problemes amb temps, conèixer les conseqüències i derivar adequadament les situacions.
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <div class="quote-category">INCLUSIÓ I DIVERSITAT</div>
+                <div class="quote-text">
+                    Preocupa l'atenció a la diversitat i la necessitat d'una inclusió efectiva. Cal aprofitar millor els recursos disponibles per garantir atenció adequada a tot l'alumnat.
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <div class="quote-category">COORDINACIÓ PRIMÀRIA-SECUNDÀRIA</div>
+                <div class="quote-text">
+                    Cal reforçar la coordinació entre Primària i Secundària. Compartir edifici hauria de facilitar un treball conjunt basat en continuïtat pedagògica i coherència metodològica entre etapes.
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <div class="quote-category">COMPETÈNCIES BÀSIQUES</div>
+                <div class="quote-text">
+                    Hi ha preocupació perquè moltes competències bàsiques no s'han assolit en bona part de l'alumnat. Cal treballar per millorar aquest aspecte fonamental.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dades de l'enquesta del Consell Escolar
+        const surveyData = {
+            'Comunicació famílies': { si: 3, no: 4, pregunta: 'Creus que la comunicació de l\'escola amb les famílies és adequada i efectiva?' },
+            'Participació famílies': { si: 3, no: 4, pregunta: 'Et sembla que les famílies participeu el suficient a l\'escola?' },
+            'Resultats acadèmics': { si: 4, no: 3, pregunta: 'Creus que els resultats acadèmics de l\'alumnat del centre són satisfactoris?' }
+        };
+
+        // Colors amb la paleta de la vinya i pergamí
+        const colors = {
+            positive: '#7D9B4F',
+            positiveLight: '#8FA862',
+            positiveDark: '#6B8E23',
+            negative: '#A0522D',
+            negativeLight: '#B8733D',
+            negativeDark: '#8B4513',
+            primary: '#6B4423',
+            secondary: '#8B5A3C',
+            accent: '#6B8E23',
+            gradient: [
+                'rgba(107, 68, 35, 0.85)',
+                'rgba(139, 90, 60, 0.85)',
+                'rgba(107, 142, 35, 0.85)'
+            ],
+            gradientBorder: [
+                '#6B4423',
+                '#8B5A3C',
+                '#6B8E23'
+            ]
+        };
+
+        // Configuració comuna
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 14,
+                            family: 'Open Sans',
+                            weight: '600'
+                        },
+                        color: '#3E2723',
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(107, 68, 35, 0.95)',
+                    titleColor: '#FEFBF6',
+                    bodyColor: '#EAD8C0',
+                    borderColor: 'rgba(107, 142, 35, 0.5)',
+                    borderWidth: 2,
+                    padding: 15,
+                    bodyFont: {
+                        size: 14
+                    },
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    displayColors: true,
+                    boxPadding: 6
+                }
+            }
+        };
+
+        // Gràfic de visió general (radar)
+        const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+        new Chart(overviewCtx, {
+            type: 'radar',
+            data: {
+                labels: Object.keys(surveyData),
+                datasets: [
+                    {
+                        label: 'Satisfacció (%)',
+                        data: Object.values(surveyData).map(d => (d.si / (d.si + d.no) * 100).toFixed(1)),
+                        backgroundColor: 'rgba(107, 142, 35, 0.2)',
+                        borderColor: colors.accent,
+                        borderWidth: 4,
+                        pointBackgroundColor: colors.primary,
+                        pointBorderColor: '#FFF',
+                        pointBorderWidth: 3,
+                        pointHoverBackgroundColor: '#FFF',
+                        pointHoverBorderColor: colors.accent,
+                        pointRadius: 7,
+                        pointHoverRadius: 10,
+                        pointStyle: 'circle'
+                    }
+                ]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        min: 0,
+                        ticks: {
+                            stepSize: 20,
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            },
+                            color: '#6D4C41',
+                            backdropColor: 'transparent'
+                        },
+                        grid: {
+                            color: 'rgba(107, 68, 35, 0.15)',
+                            lineWidth: 2
+                        },
+                        angleLines: {
+                            color: 'rgba(107, 68, 35, 0.15)',
+                            lineWidth: 2
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 13,
+                                family: 'Open Sans',
+                                weight: '600'
+                            },
+                            color: '#3E2723',
+                            padding: 15
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        borderWidth: 4,
+                        tension: 0.2
+                    }
+                }
+            }
+        });
+
+        // Funció per crear gràfic de donut
+        function createDonutChart(canvasId, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const total = data.si + data.no;
+            const percentSi = (data.si / total * 100).toFixed(1);
+            const percentNo = (data.no / total * 100).toFixed(1);
+
+            const gradientPositive = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientPositive.addColorStop(0, colors.positiveLight);
+            gradientPositive.addColorStop(0.5, colors.positive);
+            gradientPositive.addColorStop(1, colors.positiveDark);
+
+            const gradientNegative = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientNegative.addColorStop(0, colors.negativeLight);
+            gradientNegative.addColorStop(0.5, colors.negative);
+            gradientNegative.addColorStop(1, colors.negativeDark);
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [`Sí (${percentSi}%)`, `No (${percentNo}%)`],
+                    datasets: [{
+                        data: [data.si, data.no],
+                        backgroundColor: [gradientPositive, gradientNegative],
+                        borderWidth: 4,
+                        borderColor: '#FEFBF6',
+                        hoverOffset: 20,
+                        hoverBorderWidth: 5,
+                        hoverBorderColor: '#6B4423',
+                        offset: [5, 5]
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    cutout: '65%',
+                    plugins: {
+                        ...commonOptions.plugins,
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 25,
+                                font: {
+                                    size: 15,
+                                    family: 'Open Sans',
+                                    weight: '700'
+                                },
+                                color: '#3E2723',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 20,
+                                boxHeight: 20
+                            }
+                        },
+                        tooltip: {
+                            ...commonOptions.plugins.tooltip,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${value} respostes (${percent}%)`;
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 4,
+                            borderRadius: 8
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                },
+                plugins: [{
+                    beforeDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const width = chart.width;
+                        const height = chart.height;
+                        const centerX = width / 2;
+                        const centerY = height / 2;
+                        
+                        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 100);
+                        gradient.addColorStop(0, 'rgba(245, 230, 211, 0.5)');
+                        gradient.addColorStop(1, 'rgba(234, 216, 192, 0.8)');
+                        
+                        ctx.save();
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, chart.innerRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = 'bold 32px Montserrat';
+                        ctx.fillStyle = '#6B4423';
+                        ctx.fillText(`${percentSi}%`, centerX, centerY - 10);
+                        
+                        ctx.font = '14px Open Sans';
+                        ctx.fillStyle = '#6D4C41';
+                        ctx.fillText('Satisfacció', centerX, centerY + 20);
+                        ctx.restore();
+                    }
+                }]
+            });
+        }
+
+        // Crear gràfics individuals
+        createDonutChart('comunicacioChart', surveyData['Comunicació famílies']);
+        createDonutChart('participacioChart', surveyData['Participació famílies']);
+        createDonutChart('resultatsChart', surveyData['Resultats acadèmics']);
+
+        // Gràfic de comparació
+        const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+        const labels = Object.keys(surveyData);
+        const percentages = Object.values(surveyData).map(d => (d.si / (d.si + d.no) * 100).toFixed(1));
+
+        const barGradients = percentages.map((_, i) => {
+            const gradient = comparisonCtx.createLinearGradient(0, 0, 600, 0);
+            gradient.addColorStop(0, colors.gradient[i]);
+            gradient.addColorStop(1, colors.gradientBorder[i]);
+            return gradient;
+        });
+
+        new Chart(comparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Percentatge de satisfacció',
+                    data: percentages,
+                    backgroundColor: barGradients,
+                    borderColor: colors.gradientBorder,
+                    borderWidth: 3,
+                    borderRadius: 12,
+                    borderSkipped: false,
+                    hoverBackgroundColor: colors.gradientBorder,
+                    hoverBorderColor: '#6B4423',
+                    hoverBorderWidth: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        ...commonOptions.plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.x;
+                                const data = Object.values(surveyData)[context.dataIndex];
+                                return [
+                                    `${label}: ${value}%`,
+                                    `Sí: ${data.si} respostes`,
+                                    `No: ${data.no} respostes`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            },
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            },
+                            color: '#6D4C41'
+                        },
+                        grid: {
+                            color: 'rgba(107, 68, 35, 0.1)',
+                            lineWidth: 2
+                        },
+                        border: {
+                            color: 'rgba(107, 68, 35, 0.3)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 14,
+                                family: 'Open Sans',
+                                weight: '600'
+                            },
+                            color: '#3E2723',
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderWidth: 3
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+</body>
+</html>
